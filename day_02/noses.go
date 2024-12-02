@@ -8,6 +8,10 @@ import (
 )
 
 func main() {
+	//test := parseInput(readInput())
+	//fmt.Println(removeIndex(test[0], 0))
+	//fmt.Println(test[0])
+
 	//part 1
 	fmt.Println(countSafeReports(parseInput(readInput())))
 	//part 2
@@ -18,7 +22,7 @@ func main() {
 func countSafeReports(reports [][]int) int {
 	safeReports := 0
 	for _, report := range reports {
-		if isSafe(report, false) {
+		if isSafe(report) {
 			safeReports++
 		}
 	}
@@ -36,10 +40,20 @@ func countSafishReports(reports [][]int) int {
 }
 
 func isSafish(report []int) bool {
-	return (allDecreasingish(report) || allIncreasingish(report)) && allWithinTolerancish(report)
+	if isSafe(report) {
+		return true
+	}
+	for i, _ := range report {
+		if isSafe(removeIndex(report, i)) {
+			return true
+		}
+	}
+
+	return false
+
 }
 
-func isSafe(report []int, dampen bool) bool {
+func isSafe(report []int) bool {
 	return (allIncreasing(report) || allDecreasing(report)) && withinTolerance(report)
 }
 func allIncreasing(report []int) bool {
@@ -74,66 +88,11 @@ func withinTolerance(report []int) bool {
 
 }
 
-func allIncreasingish(report []int) bool {
-	//for every value, remove it and see if its allIncre
-	if allIncreasing(report) {
-		return true
-
-	}
-	for i, _ := range report {
-		if i > 0 {
-			//remove the value
-			removed := removeIndex(report, i)
-			if allIncreasing(removed) {
-				return true
-			}
-		}
-
-	}
-	return false
-}
-
-func allDecreasingish(report []int) bool {
-	//for every value, remove it and see if its allIncre
-	if allDecreasing(report) {
-		return true
-
-	}
-	for i, _ := range report {
-		if i > 0 {
-			//remove the value
-			removed := removeIndex(report, i)
-			if allDecreasing(removed) {
-				return true
-			}
-		}
-
-	}
-	return false
-}
-
-func allWithinTolerancish(report []int) bool {
-	//for every value, remove it and see if its allIncre
-	if withinTolerance(report) {
-		return true
-
-	}
-	for i, _ := range report {
-		if i > 0 {
-			//remove the value
-			removed := removeIndex(report, i)
-			if withinTolerance(removed) {
-				return true
-			}
-		}
-
-	}
-	return false
-}
-
 func removeIndex(s []int, index int) []int {
-	return append(s[:index], s[index+1:]...)
-
+	// go's append can modify the original slice, what?. ?...? Why does it return a slice then?
+	ret := make([]int, 0)
+	ret = append(ret, s[:index]...)
+	return append(ret, s[index+1:]...)
 }
 
 func parseInput(input string) [][]int {
